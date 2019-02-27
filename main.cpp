@@ -14,7 +14,7 @@ void _copyFile(string name, int version)
     string fileType = name.substr(name.rfind('.') + 1);
     ifstream in(name, ios::binary);
     name.erase(name.rfind('.'));
-    string newName = _output(name, version) + ".cpp";
+    string newName = _output(name, version) + "." + fileType;
     ofstream out(newName);
     out << in.rdbuf();
 }
