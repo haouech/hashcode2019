@@ -9,6 +9,16 @@ string _output(string inputFile, int i)
     return inputFile + ss.str();
 }
 
+void _copyFile(string name, int version)
+{
+    string fileType = name.substr(name.rfind('.') + 1);
+    ifstream in(name, ios::binary);
+    name.erase(name.rfind('.'));
+    string newName = _output(name, version) + ".cpp";
+    ofstream out(newName);
+    out << in.rdbuf();
+}
+
 pair<string, int> getOutputFile(string inputFile)
 {
     fstream file;
