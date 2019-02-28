@@ -97,6 +97,62 @@ struct Photo {
     }
 };
 
+unordered_set<string> set_intersect(unordered_set<string> s1, unordered_set<string> s2) {
+    unordered_set<string> res;
+    res.clear();
+    for(auto str : s1) {
+        if(s2.find(str) != s2.end()) res.insert(str);
+    }
+    return res;
+}
+
+int compute_score(Photo p1, Photo p2) {
+   unordered_set<string>  inter = set_intersect(p1.tags, p2.tags);
+   int size_p1 = p1.tags.size();
+   int size_p2 = p2.tags.size();
+   int size_inter = inter.size();
+   return min(size_inter, min(size_p1 - size_inter, size_p2 - size_inter));
+}
+
+bool vis[100002]
+vector<vector<int>> score_matrix;
+
+
+int dfs(vector<Photo> &photos, int photo_id) {
+    vis[photo_id] = true;
+    int max_score = 0;
+    int max_id = photo_id;
+    for(int i=0; i<photos.size(); ++i)
+    {
+        if(max_score <= score_matrix[photo_id][i])
+        {
+            max_score = score_matrix[photo_id][i];
+            max_id
+        }
+    }
+}
+
+vector<Photo> opt(vector<Photo> photos) {
+    int len = photos.size(); 
+    score_matrix.resize(photos.size());
+    for(auto v : score_matrix) v.resize(photos.size());
+    for(int i=0; i<len; ++i) {
+        for(int j=0; j<len; ++j) {
+            if(i == j) score_matrix[i][j] = 0;
+            else {
+                int score = compute_score(photos[i], photos[j]);
+                score_matrix[i][j] = score;
+                score_matrix[j][i] = score;                
+            }
+        }
+    }
+    vector<Photo> res;
+    res.clear();  
+    for(int i=0; i<len; ++i) {
+
+    }
+}
+
 void submit(ofstream &out, vector<Photo> slides, int s)
 {
     out << s << "\n";
