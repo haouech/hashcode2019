@@ -34,7 +34,7 @@ pair<string, int> getOutputFile(string inputFile)
     return {outputFileName, cur-1}; // Couldn't return the file stream directly for some reason
 }
 
-int main(int argc, char **argv)
+void _init(ifstream &inputFile, ofstream &outputFile)
 {
     srand(time(NULL));
 
@@ -47,15 +47,21 @@ int main(int argc, char **argv)
     pair<string, int> outputFilePayload = getOutputFile(inputFileName);
     string outputFileName = outputFilePayload.first;
     int outputFileIndex = outputFilePayload.second;
-    ifstream inputFile(inputFileName);
+    inputFile.open(inputFileName);
     if(!inputFile) {
         cerr << "Error: No input file found\n";
         exit(1);
     }
-    ofstream outputFile(outputFileName);
+    outputFile.open(outputFileName);
     _copyFile("main.cpp", outputFileIndex);
     cerr << "Using input file : " << inputFileName << "\n";
     cerr << "Using output file: " << outputFileName << "\n";
+}
 
+int main(int argc, char **argv)
+{
+    ifstream in;
+    ofstream out;
+    _init(in, out);
     return 0;
 }
