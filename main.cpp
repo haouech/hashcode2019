@@ -72,6 +72,7 @@ int readInt(ifstream &in)
 
 struct Photo {
     char orientation;
+    int id;
     int m;
     set<string> tags;
     void read(ifstream &in) {
@@ -88,7 +89,25 @@ struct Photo {
         }
         cerr << endl;
     }
+
+    bool h() { return orientation == 'H'; }
 };
+
+void submit(ofstream &out, vector<Photo> slides, int s)
+{
+    out << s << "\n";
+    for(int i=0; i<slides.size(); i++) {
+        Photo photo = slides[i];
+        if (photo.h()) {
+            out << photo.id << "\n";
+        } else {
+            out << photo.id << " ";
+            i++;
+            photo = slides[i];
+            out << photo.id << "\n";
+        }
+    }
+}
 
 int main(int argc, char **argv)
 {
@@ -99,8 +118,30 @@ int main(int argc, char **argv)
     N = readInt(in);
     cerr << N << endl;
     vector<Photo> photos(N);
+    vector<int> hs, vs;
     for(int i=0; i<N; i++) {
         photos[i].read(in);
+        photos[i].id = i; /// IMPORTANT
+        if (photos[i].h()) {
+            hs.push_back(i);
+        } else {
+            vs.push_back(i);
+        }
     }
+    vector<Photo> slides;
+    int s = 0;
+    for(int i=0; vs.size() >= 2, i<vs.size(); i+=2) {
+        int id = vs[i];
+        int id2  = vs[i+1];
+        slides.push_back(photos[id]);
+        slides.push_back(photos[id2]);
+        s ++;
+    }
+    for(int i=0; i<hs.size(); i++) {
+        int id = hs[i];
+        slides.push_back(photos[id]);
+        s++;
+    }
+    submit(out, slides, s);
     return 0;
 }
