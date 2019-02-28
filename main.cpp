@@ -58,10 +58,49 @@ void _init(ifstream &inputFile, ofstream &outputFile)
     cerr << "Using output file: " << outputFileName << "\n";
 }
 
+int N;
+
+int readInt(ifstream &in)
+{
+    string s;
+    getline(in, s);
+    stringstream ss(s);
+    int n;
+    ss >> n;
+    return n;
+}
+
+struct Photo {
+    char orientation;
+    int m;
+    set<string> tags;
+    void read(ifstream &in) {
+        string _s;
+        getline(in, _s);
+        stringstream ss(_s);
+        ss >> orientation >> m;
+        cerr << orientation << " " << m << " ";
+        for(int i=0; i<m; i++) {
+            string x;
+            ss >> x;
+            cerr << x << " ";
+            tags.insert(x);
+        }
+        cerr << endl;
+    }
+};
+
 int main(int argc, char **argv)
 {
     ifstream in;
     ofstream out;
     _init(in, out);
+
+    N = readInt(in);
+    cerr << N << endl;
+    vector<Photo> photos(N);
+    for(int i=0; i<N; i++) {
+        photos[i].read(in);
+    }
     return 0;
 }
