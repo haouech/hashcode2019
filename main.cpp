@@ -74,23 +74,27 @@ struct Photo {
     char orientation;
     int id;
     int m;
-    set<string> tags;
+    unordered_set<string> tags;
     void read(ifstream &in) {
         string _s;
         getline(in, _s);
         stringstream ss(_s);
         ss >> orientation >> m;
-        cerr << orientation << " " << m << " ";
+//        cerr << orientation << " " << m << " ";
         for(int i=0; i<m; i++) {
             string x;
             ss >> x;
-            cerr << x << " ";
+//            cerr << x << " ";
             tags.insert(x);
         }
-        cerr << endl;
+//        cerr << endl;
     }
 
     bool h() { return orientation == 'H'; }
+
+    bool operator <(Photo other) const {
+        return tags.size() < other.tags.size();
+    }
 };
 
 void submit(ofstream &out, vector<Photo> slides, int s)
@@ -109,6 +113,39 @@ void submit(ofstream &out, vector<Photo> slides, int s)
     }
 }
 
+vector<vector<Photo> > split(vector<Photo> photos, int batchSize)
+{
+    int sz = photos.size();
+    vector<vector<Photo> > result;
+    sort(photos.begin(), photos.end());
+    vector<Photo>::iterator it1, it2, from;
+    from = photos.begin();
+    do {
+        it1 = from;
+        if (photos.end() - from > batchSize) {
+            it2 = it1 + batchSize;
+            vector<Photo> batch(it1, it2);
+            result.push_back(batch);
+        } else {
+            it2 = photos.end();
+            vector<Photo> batch(from, it2);
+            result.push_back(batch);
+        }
+    } while (photos.end() - from > batchSize);
+//    for(int i=0; i< sz / batchSize; i++) {
+//        it1 = photos.begin() + i*batchSize;
+//        it2 = photos.begin() + (i+1)*batchSize - 1;
+//        vector<Photo> batch(it1, it2);
+//        result.push_back(batch);
+//    }
+//    sz = sz % batchSize;
+//    if (sz) {
+//        it2++;
+//        vector<Photo> batch(it2, photos.end());
+//        result.push_back(batch);
+//    }
+    return result;
+}
 int main(int argc, char **argv)
 {
     ifstream in;
@@ -116,32 +153,21 @@ int main(int argc, char **argv)
     _init(in, out);
 
     N = readInt(in);
-    cerr << N << endl;
+//    cerr << N << endl;
     vector<Photo> photos(N);
     vector<int> hs, vs;
     for(int i=0; i<N; i++) {
         photos[i].read(in);
         photos[i].id = i; /// IMPORTANT
-        if (photos[i].h()) {
-            hs.push_back(i);
-        } else {
-            vs.push_back(i);
-        }
     }
     vector<Photo> slides;
-    int s = 0;
-    for(int i=0; vs.size() >= 2, i<vs.size(); i+=2) {
-        int id = vs[i];
-        int id2  = vs[i+1];
-        slides.push_back(photos[id]);
-        slides.push_back(photos[id2]);
-        s ++;
+    vector<vector<Photo> > batches = split(photos, 100);
+    int sum = 0;
+    for(int i=0; i<batches.size(); i++) {
+        sum += batches[i].size();
     }
-    for(int i=0; i<hs.size(); i++) {
-        int id = hs[i];
-        slides.push_back(photos[id]);
-        s++;
-    }
-    submit(out, slides, s);
+    cerr << sum << " " << N << endl;
+    assert(sum == N);
+    submit(out, slides, 0);
     return 0;
 }

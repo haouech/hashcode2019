@@ -80,14 +80,14 @@ struct Photo {
         getline(in, _s);
         stringstream ss(_s);
         ss >> orientation >> m;
-        cerr << orientation << " " << m << " ";
+//        cerr << orientation << " " << m << " ";
         for(int i=0; i<m; i++) {
             string x;
             ss >> x;
-            cerr << x << " ";
+//            cerr << x << " ";
             tags.insert(x);
         }
-        cerr << endl;
+//        cerr << endl;
     }
 
     bool h() { return orientation == 'H'; }
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
     _init(in, out);
 
     N = readInt(in);
-    cerr << N << endl;
+//    cerr << N << endl;
     vector<Photo> photos(N);
     vector<int> hs, vs;
     for(int i=0; i<N; i++) {
