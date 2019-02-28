@@ -34,7 +34,7 @@ pair<string, int> getOutputFile(string inputFile)
     return {outputFileName, cur-1}; // Couldn't return the file stream directly for some reason
 }
 
-int main(int argc, char **argv)
+void _init(ifstream &inputFile, ofstream &outputFile)
 {
     srand(time(NULL));
 
@@ -47,15 +47,101 @@ int main(int argc, char **argv)
     pair<string, int> outputFilePayload = getOutputFile(inputFileName);
     string outputFileName = outputFilePayload.first;
     int outputFileIndex = outputFilePayload.second;
-    ifstream inputFile(inputFileName);
+    inputFile.open(inputFileName);
     if(!inputFile) {
         cerr << "Error: No input file found\n";
         exit(1);
     }
-    ofstream outputFile(outputFileName);
+    outputFile.open(outputFileName);
     _copyFile("main.cpp", outputFileIndex);
     cerr << "Using input file : " << inputFileName << "\n";
     cerr << "Using output file: " << outputFileName << "\n";
+}
 
+int N;
+
+int readInt(ifstream &in)
+{
+    string s;
+    getline(in, s);
+    stringstream ss(s);
+    int n;
+    ss >> n;
+    return n;
+}
+
+struct Photo {
+    char orientation;
+    int id;
+    int m;
+    set<string> tags;
+    void read(ifstream &in) {
+        string _s;
+        getline(in, _s);
+        stringstream ss(_s);
+        ss >> orientation >> m;
+        cerr << orientation << " " << m << " ";
+        for(int i=0; i<m; i++) {
+            string x;
+            ss >> x;
+            cerr << x << " ";
+            tags.insert(x);
+        }
+        cerr << endl;
+    }
+
+    bool h() { return orientation == 'H'; }
+};
+
+void submit(ofstream &out, vector<Photo> slides, int s)
+{
+    out << s << "\n";
+    for(int i=0; i<slides.size(); i++) {
+        Photo photo = slides[i];
+        if (photo.h()) {
+            out << photo.id << "\n";
+        } else {
+            out << photo.id << " ";
+            i++;
+            photo = slides[i];
+            out << photo.id << "\n";
+        }
+    }
+}
+
+int main(int argc, char **argv)
+{
+    ifstream in;
+    ofstream out;
+    _init(in, out);
+
+    N = readInt(in);
+    cerr << N << endl;
+    vector<Photo> photos(N);
+    vector<int> hs, vs;
+    for(int i=0; i<N; i++) {
+        photos[i].read(in);
+        photos[i].id = i; /// IMPORTANT
+        if (photos[i].h()) {
+            hs.push_back(i);
+        } else {
+            vs.push_back(i);
+        }
+    }
+    vector<Photo> slides;
+    int s = 0;
+    for(int i=0; vs.size() >= 2, i<vs.size(); i+=2) {
+        int id = vs[i];
+        int id2  = vs[i+1];
+        slides.push_back(photos[id]);
+        slides.push_back(photos[id2]);
+        s ++;
+    }
+    for(int i=0; i<hs.size(); i++) {
+        int id = hs[i];
+        slides.push_back(photos[id]);
+        s++;
+    }
+    submit(out, slides, s);
     return 0;
 }
